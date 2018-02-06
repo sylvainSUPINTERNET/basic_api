@@ -8,6 +8,8 @@ from rest_framework.views import APIView
 from django.http import Http404
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 
@@ -18,6 +20,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated,)
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -26,6 +29,8 @@ class GroupViewSet(viewsets.ModelViewSet):
     """
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+    permission_classes = (IsAuthenticated,)
+
 
 
 class PermissionViewSet(viewsets.ModelViewSet):
@@ -34,16 +39,21 @@ class PermissionViewSet(viewsets.ModelViewSet):
     """
     queryset = Permission.objects.all()
     serializer_class = PermissionSerializer
+    permission_classes = (IsAuthenticated,)
 
 
 class SpellList(APIView):
+    permission_classes = (IsAuthenticated,)
+
     """
     List all spells, or create a new spell.
     """
     def get(self, request, format=None):
         spell = Spell.objects.all()
         serializer = SpellSerializer(spell, many=True)
+
         return Response(serializer.data)
+
 
     def post(self, request, format=None):
         serializer = SpellSerializer(data=request.data)
@@ -57,11 +67,15 @@ class SpellDetails(APIView):
     """
     Retrieve, update or delete a spell instance.
     """
+
+
+
     def get_object(self, pk):
         try:
             return Spell.objects.get(pk=pk)
         except Spell.DoesNotExist:
             raise Http404
+
 
     def get(self, request, pk, format=None):
         spell = self.get_object(pk)

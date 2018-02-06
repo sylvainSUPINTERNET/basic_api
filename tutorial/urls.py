@@ -21,16 +21,21 @@ from django.urls import path
 from django.conf.urls import url, include
 from rest_framework import routers
 from api import views
+from rest_framework.urlpatterns import format_suffix_patterns
+from api import views
+
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'permissions', views.PermissionViewSet)
-router.register(r'spell', views.SpellViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     url(r'^', include(router.urls)),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^spells/$', views.SpellList.as_view()),
+    url(r'^spells/(?P<pk>[0-9]+)/$', views.SpellDetails.as_view()),
 ]
+
